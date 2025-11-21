@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: auth-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: auth-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/auth_db
+      CORS_ORIGIN: http://localhost:3001
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID}
+      AZURE_REDIRECT_URI: ${AZURE_REDIRECT_URI}
+      EMAIL_SERVICE_API_KEY: ${EMAIL_SERVICE_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM}
+      EMAIL_VERIFICATION_URL: ${EMAIL_VERIFICATION_URL}
+      PASSWORD_RESET_URL: ${PASSWORD_RESET_URL}
+      ADMIN_PANEL_ENABLED: ${ADMIN_PANEL_ENABLED:-true}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: sh -c "npm run migrate && node dist/app.js"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: auth-frontend
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:3000/api/v1
+      - VITE_AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - VITE_AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      - VITE_AZURE_REDIRECT_URI=${AZURE_REDIRECT_URI}
+
+  admin-panel:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.admin
+    container_name: auth-admin-panel
+    ports:
+      - "3002:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:3000/api/v1
+
+volumes:
+  postgres_data:
+
