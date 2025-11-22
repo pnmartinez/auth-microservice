@@ -210,7 +210,7 @@ export class AdminController {
     }
   }
 
-  async getStats(req: AuthRequest, res: Response): Promise<void> {
+  async getStats(_req: AuthRequest, res: Response): Promise<void> {
     try {
       const [
         totalUsers,

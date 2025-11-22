@@ -6,10 +6,22 @@ export interface JWTPayload {
   type: 'access' | 'refresh';
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || '';
-const JWT_PUBLIC_KEY = process.env.JWT_PUBLIC_KEY || '';
-const ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
-const REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+function requireJwtKey(key: 'JWT_SECRET' | 'JWT_PUBLIC_KEY'): string {
+  const value = process.env[key];
+
+  if (!value || !value.trim()) {
+    throw new Error(`${key} must be set to a non-empty value`);
+  }
+
+  return value;
+}
+
+const JWT_SECRET = requireJwtKey('JWT_SECRET');
+const JWT_PUBLIC_KEY = requireJwtKey('JWT_PUBLIC_KEY');
+const ACCESS_EXPIRES_IN: SignOptions['expiresIn'] =
+  (process.env.JWT_ACCESS_EXPIRES_IN as SignOptions['expiresIn']) || '15 minutes';
+const REFRESH_EXPIRES_IN: SignOptions['expiresIn'] =
+  (process.env.JWT_REFRESH_EXPIRES_IN as SignOptions['expiresIn']) || '7 days';
 
 export function signAccessToken(payload: Omit<JWTPayload, 'type'>): string {
   const options: SignOptions = {

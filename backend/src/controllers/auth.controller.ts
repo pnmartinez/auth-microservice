@@ -51,9 +51,9 @@ export class AuthController {
     }
   }
 
-  async azureLogin(req: Request, res: Response): Promise<void> {
+  async azureLogin(_req: Request, res: Response): Promise<void> {
     try {
-      const authUrl = azureService.getAuthUrl();
+      const authUrl = await azureService.getAuthUrl();
       res.json({ authUrl });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to initiate Azure login';
@@ -87,9 +87,9 @@ export class AuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
 
-      // Redirect to frontend with access token
+      // Redirect to frontend without exposing tokens in the URL
       const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:3001';
-      res.redirect(`${frontendUrl}/auth/callback?token=${result.accessToken}`);
+      res.redirect(`${frontendUrl}/auth/callback`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Azure authentication failed';
       const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:3001';

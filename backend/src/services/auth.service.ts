@@ -13,6 +13,10 @@ import {
   NotFoundError,
 } from '../utils/errors';
 
+const LOGIN_LOCKOUT_WINDOW_MS = parseInt(process.env.LOGIN_LOCKOUT_WINDOW_MS || '900000'); // 15 minutes
+const MAX_FAILED_ATTEMPTS_PER_EMAIL = parseInt(process.env.LOGIN_MAX_FAILED_EMAIL || '5');
+const MAX_FAILED_ATTEMPTS_PER_IP = parseInt(process.env.LOGIN_MAX_FAILED_IP || '15');
+
 export interface User {
   id: string;
   email: string;
@@ -99,6 +103,8 @@ export class AuthService {
     refreshToken: string;
     user: User;
   }> {
+    await this.enforceLoginCooldown(data.email, ipAddress);
+
     // Find user
     const user = await db('users').where({ email: data.email }).first();
     
@@ -286,6 +292,45 @@ export class AuthService {
     }
 
     return signAccessToken({ userId: user.id, email: user.email });
+  }
+
+  private async enforceLoginCooldown(email: string, ipAddress: string): Promise<void> {
+    const windowStart = new Date(Date.now() - LOGIN_LOCKOUT_WINDOW_MS);
+
+    const emailAggregation = await db('login_attempts')
+      .where({ email, success: false })
+      .where('created_at', '>=', windowStart)
+      .select(db.raw('COUNT(*) as count'), db.raw('MAX(created_at) as last_attempt'))
+      .first();
+
+    const ipAggregation = await db('login_attempts')
+      .where({ ip_address: ipAddress, success: false })
+      .where('created_at', '>=', windowStart)
+      .select(db.raw('COUNT(*) as count'), db.raw('MAX(created_at) as last_attempt'))
+      .first();
+
+    const emailFailures = parseInt((emailAggregation?.count as string) || '0', 10);
+    const ipFailures = parseInt((ipAggregation?.count as string) || '0', 10);
+
+    const lockoutTriggered =
+      emailFailures >= MAX_FAILED_ATTEMPTS_PER_EMAIL || ipFailures >= MAX_FAILED_ATTEMPTS_PER_IP;
+
+    if (lockoutTriggered) {
+      const recentFailureTimestamp = [emailAggregation?.last_attempt, ipAggregation?.last_attempt]
+        .filter(Boolean)
+        .map((value) => new Date(value as string).getTime())
+        .reduce((latest, current) => Math.max(latest, current), 0);
+
+      const retryAfterMs = Math.max(
+        0,
+        LOGIN_LOCKOUT_WINDOW_MS - (Date.now() - (recentFailureTimestamp || Date.now()))
+      );
+      const retryAfterMinutes = Math.ceil(retryAfterMs / 60000);
+
+      throw new AuthenticationError(
+        `Too many failed login attempts. Please try again in ${retryAfterMinutes} minute(s).`
+      );
+    }
   }
 
   private async recordLoginAttempt(email: string, ipAddress: string, success: boolean): Promise<void> {

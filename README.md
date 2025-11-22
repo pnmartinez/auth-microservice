@@ -48,6 +48,26 @@ docker-compose up -d
 docker-compose exec backend npm run migrate
 ```
 
+### Ejecutar tests con Docker Compose
+
+Levanta una instancia de PostgreSQL aislada para los tests automatizados usando el compose dedicado, que expone el puerto `5433` y crea la base de datos `auth_db_test`.
+
+```bash
+# Arrancar la base de datos de pruebas
+docker-compose -f docker-compose.test.yml up -d postgres-test
+
+# (Opcional) Verificar el estado
+docker-compose -f docker-compose.test.yml ps
+
+# En otra terminal, instalar dependencias y correr migraciones en el entorno de test
+cd backend
+npm install
+npm run migrate -- --env test
+
+# Ejecutar la suite de pruebas
+npm test -- --runInBand
+```
+
 ## Estructura del Proyecto
 
 ```

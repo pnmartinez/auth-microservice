@@ -2,6 +2,11 @@ import knex, { Knex } from 'knex';
 import config from '../../knexfile';
 
 const environment = process.env.NODE_ENV || 'development';
+
+if (environment === 'production' && !process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL must be configured in production to avoid default credentials');
+}
+
 const dbConfig = config[environment];
 
 export const db: Knex = knex(dbConfig);

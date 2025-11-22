@@ -4,6 +4,8 @@
 
 Se han creado tests completos para la aplicación de autenticación. Los tests están listos para ejecutarse una vez que la base de datos esté configurada.
 
+> **Última ejecución (npm test -- --runInBand)**: falló por `ECONNREFUSED 127.0.0.1:5433` al no disponer de PostgreSQL en esta VM. No se pudo levantar el contenedor de base de datos porque los comandos `docker`/`docker-compose` no están instalados y la instalación vía `apt-get` falla con respuestas 403 del proxy.
+
 ## Tests Creados
 
 ### ✅ Tests Unitarios de Servicios
