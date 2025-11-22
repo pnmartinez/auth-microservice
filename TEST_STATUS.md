@@ -4,6 +4,8 @@
 
 Los tests han sido **implementados correctamente** pero actualmente **no pueden ejecutarse** debido a dos problemas principales:
 
+> **Última ejecución (npm test -- --runInBand)**: falló por `ECONNREFUSED 127.0.0.1:5433` al no tener un servicio de PostgreSQL disponible en el entorno de CI/VM.
+
 ### ✅ Lo que está bien:
 
 1. **Estructura de tests completa**:
@@ -27,7 +29,7 @@ Los tests han sido **implementados correctamente** pero actualmente **no pueden 
 
 #### 1. **Base de Datos No Disponible** (Esperado)
 ```
-Error: connect ECONNREFUSED 127.0.0.1:5432
+Error: connect ECONNREFUSED 127.0.0.1:5433
 ```
 **Solución**: Necesitas iniciar PostgreSQL antes de ejecutar tests.
 
@@ -88,6 +90,8 @@ docker run -d --name auth-test-db \
   -e POSTGRES_DB=auth_db_test \
   -p 5433:5432 \
   postgres:14-alpine
+
+# Nota: en esta VM no está disponible `docker` ni `docker-compose`, y no es posible instalar paquetes adicionales (los repositorios APT responden 403). Debes levantar PostgreSQL fuera de la VM o en un entorno con Docker habilitado.
 
 # Opción B: PostgreSQL local
 createdb auth_db_test

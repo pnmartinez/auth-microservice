@@ -11,19 +11,43 @@ import api from './services/api';
 
 function AuthCallback() {
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
   const error = searchParams.get('error');
+  const [status, setStatus] = React.useState<'processing' | 'error'>('processing');
+  const [message, setMessage] = React.useState('Processing authentication...');
 
   useEffect(() => {
-    if (token) {
-      localStorage.setItem('accessToken', token);
-      window.location.href = '/dashboard';
-    } else if (error) {
-      window.location.href = `/login?error=${encodeURIComponent(error)}`;
+    if (error) {
+      setStatus('error');
+      setMessage(error);
+      return;
     }
-  }, [token, error]);
 
-  return <div>Processing authentication...</div>;
+    const finalizeLogin = async () => {
+      try {
+        const response = await api.post('/auth/refresh');
+        const token = response.data.accessToken;
+
+        if (token) {
+          localStorage.setItem('accessToken', token);
+          window.location.href = '/dashboard';
+        } else {
+          throw new Error('Access token missing from response');
+        }
+      } catch (err: any) {
+        const errorMessage = err?.response?.data?.error || 'Authentication failed. Please login again.';
+        setStatus('error');
+        setMessage(errorMessage);
+      }
+    };
+
+    finalizeLogin();
+  }, [error]);
+
+  if (status === 'error') {
+    return <div>{message}</div>;
+  }
+
+  return <div>{message}</div>;
 }
 
 function VerifyEmail() {
