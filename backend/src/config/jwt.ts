@@ -8,8 +8,8 @@ export interface JWTPayload {
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
 const JWT_PUBLIC_KEY = process.env.JWT_PUBLIC_KEY || '';
-const ACCESS_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
-const REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+const ACCESS_EXPIRES_IN = (process.env.JWT_ACCESS_EXPIRES_IN || '15m') as jwt.SignOptions['expiresIn'];
+const REFRESH_EXPIRES_IN = (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as jwt.SignOptions['expiresIn'];
 
 export function signAccessToken(payload: Omit<JWTPayload, 'type'>): string {
   const options: SignOptions = {

@@ -40,3 +40,5 @@ docker-compose.override.yml
 tmp/
 temp/
 
+.pids/
+logs/

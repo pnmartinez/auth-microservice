@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { authService } from '../services/auth.service';
 import { azureService } from '../services/azure.service';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { AppError } from '../utils/errors';
 
 export class AuthController {
   async register(req: Request, res: Response): Promise<void> {
@@ -17,8 +18,11 @@ export class AuthController {
         },
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Registration failed';
-      res.status(400).json({ error: message });
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ error: error.message });
+        return;
+      }
+      res.status(400).json({ error: 'Registration failed' });
     }
   }
 
@@ -51,9 +55,9 @@ export class AuthController {
     }
   }
 
-  async azureLogin(req: Request, res: Response): Promise<void> {
+  async azureLogin(_req: Request, res: Response): Promise<void> {
     try {
-      const authUrl = azureService.getAuthUrl();
+      const authUrl = await azureService.getAuthUrl();
       res.json({ authUrl });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to initiate Azure login';

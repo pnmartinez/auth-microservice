@@ -5,7 +5,7 @@ import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { ValidationError } from '../utils/errors';
 
 export class AzureService {
-  getAuthUrl(): string {
+  async getAuthUrl(): Promise<string> {
     const authCodeUrlParameters = {
       scopes: ['openid', 'profile', 'email'],
       redirectUri: azureRedirectUri,

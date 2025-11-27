@@ -1,38 +1,35 @@
 import dotenv from 'dotenv';
 import path from 'path';
-
-// Load test environment variables
-dotenv.config({ path: path.resolve(__dirname, '../.env.test') });
-
 import { db } from '../src/config/database';
 
-// Setup test database
+// Ensure we load test environment variables before anything else
+dotenv.config({ path: path.resolve(__dirname, '../.env.test') });
+
 beforeAll(async () => {
-  // Ensure database connection
   try {
-    await db.raw('SELECT 1');
+    await db.migrate.latest();
+    await db.seed.run();
   } catch (error) {
-    console.warn('Database connection failed, tests may fail:', error);
+    console.error('Error preparing test database:', error);
+    throw error;
+  }
+});
+
+afterEach(async () => {
+  try {
+    await db('login_attempts').del();
+    await db('refresh_tokens').del();
+    await db('email_verifications').del();
+    await db('password_resets').del();
+    await db('user_roles').del();
+    await db('users').del();
+  } catch (error) {
+    console.warn('Cleanup failed:', error);
   }
 });
 
 afterAll(async () => {
-  // Close database connection
+  await db.migrate.rollback(undefined, true);
   await db.destroy();
-});
-
-// Clean up after each test
-afterEach(async () => {
-  try {
-    // Clean up test data
-    await db('login_attempts').delete();
-    await db('password_resets').delete();
-    await db('email_verifications').delete();
-    await db('refresh_tokens').delete();
-    await db('user_roles').delete();
-    await db('users').delete();
-  } catch (error) {
-    // Ignore cleanup errors
-  }
 });
 

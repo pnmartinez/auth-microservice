@@ -65,12 +65,16 @@ export async function requireAdmin(
     return;
   }
 
-  const isAdmin = await roleService.hasRole(req.user.userId, 'admin');
-  if (!isAdmin) {
-    throw new AuthorizationError('Admin access required');
-  }
+  try {
+    const isAdmin = await roleService.hasRole(req.user.userId, 'admin');
+    if (!isAdmin) {
+      return next(new AuthorizationError('Admin access required'));
+    }
 
-  next();
+    next();
+  } catch (error) {
+    next(error);
+  }
 }
 
 export function requirePermission(permission: string) {
@@ -84,12 +88,16 @@ export function requirePermission(permission: string) {
       return;
     }
 
-    const hasPermission = await roleService.hasPermission(req.user.userId, permission);
-    if (!hasPermission) {
-      throw new AuthorizationError(`Permission required: ${permission}`);
-    }
+    try {
+      const hasPermission = await roleService.hasPermission(req.user.userId, permission);
+      if (!hasPermission) {
+        return next(new AuthorizationError(`Permission required: ${permission}`));
+      }
 
-    next();
+      next();
+    } catch (error) {
+      next(error);
+    }
   };
 }
 

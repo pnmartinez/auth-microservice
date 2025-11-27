@@ -29,24 +29,36 @@ Sistema de autenticación modular y seguro que puede integrarse fácilmente en a
 - Docker y Docker Compose
 - PostgreSQL 14+ (o usar el contenedor Docker)
 
-### Instalación
-
-1. Clonar el repositorio
-2. Copiar `.env.example` a `.env` y configurar variables
-3. Ejecutar migraciones de base de datos
-4. Iniciar servicios con Docker Compose
+### Instalación Rápida
 
 ```bash
-# Configurar variables de entorno
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
+# 1. Clonar el repositorio
+git clone https://github.com/pnmartinez/auth-microservice.git
+cd auth-microservice
 
-# Iniciar con Docker Compose
-docker-compose up -d
+# 2. Generar JWT keys
+./scripts/generate-jwt-keys.sh
 
-# Ejecutar migraciones
-docker-compose exec backend npm run migrate
+# 3. Configurar variables de entorno (ver QUICKSTART.md)
+
+# 4. Instalar dependencias
+cd backend && npm install && cd ..
+cd frontend && npm install && cd ..
+cd admin-panel && npm install && cd ..
+
+# 5. Iniciar todos los servicios
+./scripts/start-all.sh
+
+# 6. Verificar estado
+./scripts/status.sh
 ```
+
+### Scripts de Gestión
+
+- `./scripts/start-all.sh` - Inicia todos los servicios
+- `./scripts/stop-all.sh` - Detiene todos los servicios
+- `./scripts/status.sh` - Muestra el estado de los servicios
+- `./scripts/restart.sh` - Reinicia todos los servicios
 
 ## Estructura del Proyecto
 

@@ -1,0 +1,15 @@
+{
+  "name": "auth-crawler",
+  "version": "1.0.0",
+  "description": "Crawler para simular login en el sistema de autenticación",
+  "main": "crawler.js",
+  "scripts": {
+    "crawler": "node crawler.js",
+    "crawler:headless": "HEADLESS=true node crawler.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.6.1"
+  }
+}
+
+
