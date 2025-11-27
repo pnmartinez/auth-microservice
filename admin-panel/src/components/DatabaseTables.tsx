@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../services/api';
+import Layout from './Layout';
 
 const TABLES = ['users', 'email_verifications', 'password_resets', 'refresh_tokens', 'login_attempts'];
 
@@ -31,107 +32,90 @@ export default function DatabaseTables() {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   const columns = data.length > 0 ? Object.keys(data[0]) : [];
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Database Tables</h1>
-      <div style={{ marginBottom: '20px' }}>
-        <label>
-          Select Table:
-          <select
-            value={selectedTable}
-            onChange={(e) => {
-              setSelectedTable(e.target.value);
-              setPage(1);
-            }}
-            style={{ padding: '8px', marginLeft: '10px', width: '200px' }}
-          >
-            {TABLES.map((table) => (
-              <option key={table} value={table}>
-                {table}
-              </option>
-            ))}
-          </select>
-        </label>
+    <Layout title="Database tables" subtitle="Peek into whitelisted tables without leaving the browser">
+      <div className="card" style={{ marginBottom: '20px' }}>
+        <span className="stat-sub">Select table</span>
+        <div
+          style={{
+            marginTop: '12px',
+            display: 'flex',
+            gap: '10px',
+            overflowX: 'auto',
+            paddingBottom: '4px',
+          }}
+        >
+          {TABLES.map((table) => {
+            const active = table === selectedTable;
+            return (
+              <button
+                key={table}
+                type="button"
+                className={`btn ${active ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ whiteSpace: 'nowrap' }}
+                onClick={() => {
+                  setSelectedTable(table);
+                  setPage(1);
+                }}
+              >
+                {table.replace('_', ' ')}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {data.length > 0 ? (
-        <>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f8f9fa' }}>
+      <div className="card table-wrapper" style={{ fontSize: '0.85rem' }}>
+        {loading ? (
+          'Loading records…'
+        ) : data.length === 0 ? (
+          <p>No records for this table.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                {columns.map((col) => (
+                  <th key={col}>{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((row, idx) => (
+                <tr key={idx}>
                   {columns.map((col) => (
-                    <th
-                      key={col}
-                      style={{
-                        padding: '8px',
-                        textAlign: 'left',
-                        border: '1px solid #dee2e6',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {col}
-                    </th>
+                    <td key={col} title={String(row[col])}>
+                      {typeof row[col] === 'boolean'
+                        ? row[col]
+                          ? 'true'
+                          : 'false'
+                        : row[col]?.toString() ?? 'null'}
+                    </td>
                   ))}
                 </tr>
-              </thead>
-              <tbody>
-                {data.map((row, idx) => (
-                  <tr key={idx}>
-                    {columns.map((col) => (
-                      <td
-                        key={col}
-                        style={{
-                          padding: '8px',
-                          border: '1px solid #dee2e6',
-                          maxWidth: '200px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                        title={String(row[col])}
-                      >
-                        {typeof row[col] === 'boolean'
-                          ? row[col]
-                            ? 'true'
-                            : 'false'
-                          : row[col]?.toString().substring(0, 50) || 'null'}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div style={{ marginTop: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              style={{ padding: '8px 16px', cursor: page === 1 ? 'not-allowed' : 'pointer' }}
-            >
-              Previous
-            </button>
-            <span>
-              Page {page} of {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              style={{ padding: '8px 16px', cursor: page === totalPages ? 'not-allowed' : 'pointer' }}
-            >
-              Next
-            </button>
-          </div>
-        </>
-      ) : (
-        <p>No data available</p>
-      )}
-    </div>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <div className="pagination">
+        <button className="btn btn-ghost" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+          Previous
+        </button>
+        <span>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          className="btn btn-ghost"
+          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          disabled={page === totalPages}
+        >
+          Next
+        </button>
+      </div>
+    </Layout>
   );
 }
 

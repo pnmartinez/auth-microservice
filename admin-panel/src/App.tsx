@@ -1,10 +1,11 @@
 import React from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import UsersTable from './components/UsersTable';
 import DatabaseTables from './components/DatabaseTables';
-import api from './services/api';
+import Tokens from './components/Tokens';
+import LoginAttempts from './components/LoginAttempts';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('accessToken');
@@ -31,6 +32,22 @@ function App() {
         element={
           <ProtectedRoute>
             <UsersTable />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/tokens"
+        element={
+          <ProtectedRoute>
+            <Tokens />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/login-attempts"
+        element={
+          <ProtectedRoute>
+            <LoginAttempts />
           </ProtectedRoute>
         }
       />

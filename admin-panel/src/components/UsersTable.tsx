@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../services/api';
+import Layout from './Layout';
 
 interface User {
   id: string;
@@ -49,15 +50,11 @@ export default function UsersTable() {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Users Management</h1>
-      <div style={{ marginBottom: '20px' }}>
+    <Layout title="Users" subtitle="Search, verify and deactivate accounts in a single view">
+      <div className="card" style={{ marginBottom: '20px' }}>
         <input
+          className="input"
           type="text"
           placeholder="Search by email..."
           value={search}
@@ -65,75 +62,73 @@ export default function UsersTable() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          style={{ padding: '8px', width: '300px', marginRight: '10px' }}
         />
       </div>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f8f9fa' }}>
-            <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #dee2e6' }}>Email</th>
-            <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #dee2e6' }}>Verified</th>
-            <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #dee2e6' }}>Active</th>
-            <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #dee2e6' }}>Created</th>
-            <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #dee2e6' }}>Last Login</th>
-            <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #dee2e6' }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>{user.email}</td>
-              <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                {user.email_verified ? '✓' : '✗'}
-              </td>
-              <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                {user.is_active ? '✓' : '✗'}
-              </td>
-              <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                {new Date(user.created_at).toLocaleDateString()}
-              </td>
-              <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
-              </td>
-              <td style={{ padding: '10px', border: '1px solid #dee2e6' }}>
-                <button
-                  onClick={() => toggleUserStatus(user.id, user.is_active)}
-                  style={{
-                    padding: '5px 10px',
-                    backgroundColor: user.is_active ? '#dc3545' : '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {user.is_active ? 'Deactivate' : 'Activate'}
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div style={{ marginTop: '20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-        <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-          style={{ padding: '8px 16px', cursor: page === 1 ? 'not-allowed' : 'pointer' }}
-        >
+
+      <div className="card table-wrapper">
+        {loading ? (
+          'Loading users...'
+        ) : users.length === 0 ? (
+          <p>No users found.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Verified</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Last login</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.email}</td>
+                  <td>
+                    <span className={`badge ${user.email_verified ? 'badge-success' : 'badge-neutral'}`}>
+                      {user.email_verified ? 'Verified' : 'Pending'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`badge ${user.is_active ? 'badge-success' : 'badge-danger'}`}>
+                      {user.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td>{new Date(user.created_at).toLocaleString()}</td>
+                  <td>{user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</td>
+                  <td>
+                    <button
+                      className="btn btn-ghost"
+                      onClick={() => toggleUserStatus(user.id, user.is_active)}
+                    >
+                      {user.is_active ? 'Deactivate' : 'Activate'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <div className="pagination">
+        <button className="btn btn-ghost" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
           Previous
         </button>
         <span>
           Page {page} of {totalPages}
         </span>
         <button
+          className="btn btn-ghost"
           onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
           disabled={page === totalPages}
-          style={{ padding: '8px 16px', cursor: page === totalPages ? 'not-allowed' : 'pointer' }}
         >
           Next
         </button>
       </div>
-    </div>
+    </Layout>
   );
 }
 

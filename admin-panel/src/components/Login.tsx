@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -26,50 +26,49 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '100px auto', padding: '20px' }}>
-      <h1>Admin Panel Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label>
-            Email:
+    <div className="auth-wrapper">
+      <div className="auth-card">
+        <p className="eyebrow">Zorouli Control</p>
+        <h1>Welcome back</h1>
+        <p className="stat-sub" style={{ marginBottom: '24px' }}>
+          Use your admin credentials to access the control center.
+        </p>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label className="stat-sub" htmlFor="email">
+              Email address
+            </label>
             <input
+              id="email"
+              className="input"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={{ width: '100%', padding: '8px', marginTop: '5px', boxSizing: 'border-box' }}
+              placeholder="you@company.com"
             />
-          </label>
-        </div>
-        <div style={{ marginBottom: '15px' }}>
-          <label>
-            Password:
+          </div>
+          <div>
+            <label className="stat-sub" htmlFor="password">
+              Password
+            </label>
             <input
+              id="password"
+              className="input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              style={{ width: '100%', padding: '8px', marginTop: '5px', boxSizing: 'border-box' }}
+              placeholder="••••••••"
             />
-          </label>
-        </div>
-        {error && <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-          }}
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+          </div>
+          {error && <div className="error-text">{error}</div>}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Signing in…' : 'Sign in'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
