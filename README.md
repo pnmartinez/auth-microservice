@@ -2,6 +2,10 @@
 
 Sistema de autenticación modular y seguro que puede integrarse fácilmente en aplicaciones React.js, con soporte para Azure AD y autenticación tradicional (email/password), utilizando PostgreSQL como base de datos.
 
+<img width="1280" height="879" alt="image" src="https://github.com/user-attachments/assets/0973b11b-ec2c-4dd4-8f90-1f47fca46e7d" />
+<img width="1280" height="879" alt="image" src="https://github.com/user-attachments/assets/e992c84a-0b02-4f91-b5c3-47b0aee9940f" />
+
+
 ## Características
 
 - ✅ Login con email/password tradicional
