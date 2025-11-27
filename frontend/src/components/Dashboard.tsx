@@ -12,32 +12,37 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '50px auto', padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h1>Dashboard</h1>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-          }}
-        >
-          Logout
-        </button>
-      </div>
-      <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px' }}>
-        <h2>Welcome, {user?.email}!</h2>
-        <p>Email Verified: {user?.emailVerified ? 'Yes' : 'No'}</p>
-        <p>User ID: {user?.id}</p>
-      </div>
-      <div style={{ marginTop: '20px' }}>
-        <a href="/admin" style={{ color: '#007bff', textDecoration: 'none' }}>
-          Go to Admin Panel
-        </a>
+    <div className="user-dashboard">
+      <div className="user-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+          <div>
+            <p className="eyebrow">Workspace</p>
+            <h1 style={{ margin: 0 }}>Welcome back</h1>
+            <p className="stat-sub">You are logged in as {user?.email}</p>
+          </div>
+          <button className="btn btn-ghost" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+
+        <div style={{ marginTop: 32, display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+          <div>
+            <p className="stat-sub">Email status</p>
+            <span className={`badge ${user?.emailVerified ? 'badge-success' : 'badge-muted'}`}>
+              {user?.emailVerified ? 'Verified' : 'Pending'}
+            </span>
+          </div>
+          <div>
+            <p className="stat-sub">User ID</p>
+            <p style={{ margin: 0, fontWeight: 600 }}>{user?.id}</p>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 32 }}>
+          <a href="/admin" className="btn btn-primary">
+            Go to admin console
+          </a>
+        </div>
       </div>
     </div>
   );

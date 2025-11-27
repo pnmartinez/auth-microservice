@@ -2,8 +2,16 @@ import rateLimit from 'express-rate-limit';
 import { Request } from 'express';
 import { db } from '../config/database';
 
-const WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'); // 15 minutes
-const MAX_REQUESTS = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '5');
+const isDevelopment = (process.env.NODE_ENV || 'development') !== 'production';
+const WINDOW_MS = parseInt(
+  process.env.RATE_LIMIT_WINDOW_MS || (isDevelopment ? '60000' : '900000')
+); // 1 min dev / 15 min prod
+const MAX_REQUESTS = parseInt(
+  process.env.RATE_LIMIT_MAX_REQUESTS || (isDevelopment ? '100' : '5')
+);
+const LOGIN_MAX_REQUESTS = parseInt(
+  process.env.RATE_LIMIT_LOGIN_MAX_REQUESTS || (isDevelopment ? '20' : '5')
+);
 
 // General rate limiter for auth endpoints
 export const authRateLimiter = rateLimit({
@@ -17,7 +25,7 @@ export const authRateLimiter = rateLimit({
 // Stricter rate limiter for login attempts
 export const loginRateLimiter = rateLimit({
   windowMs: WINDOW_MS,
-  max: 5,
+  max: LOGIN_MAX_REQUESTS,
   message: 'Too many login attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -33,7 +41,7 @@ export const loginRateLimiter = rateLimit({
       .first();
 
     const count = parseInt(recentAttempts?.count as string || '0');
-    return count < MAX_REQUESTS;
+    return count < LOGIN_MAX_REQUESTS;
   },
 });
 

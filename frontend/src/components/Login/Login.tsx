@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMsal } from '@azure/msal-react';
 import { useAuth } from '../../hooks/useAuth';
-import { loginRequest } from '../../utils/azureConfig';
 import api from '../../services/api';
+import AuthLayout from '../AuthLayout';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -11,7 +10,6 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-  const { instance } = useMsal();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,77 +37,59 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px' }}>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label>
-            Email:
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-            />
+    <AuthLayout title="Welcome back" subtitle="Access your Auto Microservice workspace">
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div>
+          <label className="stat-sub" htmlFor="email">
+            Email address
           </label>
+          <input
+            id="email"
+            className="input"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="you@example.com"
+          />
         </div>
-        <div style={{ marginBottom: '15px' }}>
-          <label>
-            Password:
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-            />
+        <div>
+          <label className="stat-sub" htmlFor="password">
+            Password
           </label>
+          <input
+            id="password"
+            className="input"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            placeholder="••••••••"
+          />
         </div>
-        {error && <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-          }}
-        >
-          {loading ? 'Logging in...' : 'Login'}
+        {error && <p className="error-text">{error}</p>}
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
-      <div style={{ marginTop: '20px', textAlign: 'center' }}>
-        <button
+
+      <button
           onClick={handleAzureLogin}
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#0078d4',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-          }}
+          className="btn btn-ghost"
+          style={{ width: '100%', marginTop: 12 }}
         >
-          Login with Azure AD
+          Continue with Azure AD
         </button>
-      </div>
-      <div style={{ marginTop: '15px', textAlign: 'center' }}>
-        <a href="/register" style={{ color: '#007bff', textDecoration: 'none' }}>
-          Don't have an account? Register
-        </a>
-      </div>
-      <div style={{ marginTop: '10px', textAlign: 'center' }}>
-        <a href="/forgot-password" style={{ color: '#007bff', textDecoration: 'none' }}>
+
+      <div style={{ marginTop: 16, textAlign: 'center' }}>
+        <a href="/forgot-password" className="link" style={{ display: 'block', marginBottom: 6 }}>
           Forgot password?
         </a>
+        <a href="/register" className="link">
+          Create an account
+        </a>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
 

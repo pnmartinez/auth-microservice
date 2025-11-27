@@ -5,6 +5,7 @@ import { PublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider } from '@azure/msal-react';
 import App from './App';
 import { msalConfig } from './utils/azureConfig';
+import './styles/global.css';
 
 const msalInstance = new PublicClientApplication(msalConfig);
 

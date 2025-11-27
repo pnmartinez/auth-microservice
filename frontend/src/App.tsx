@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
-import { useMsal } from '@azure/msal-react';
 import { AuthProvider } from './contexts/AuthContext';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
@@ -8,6 +7,7 @@ import PasswordReset from './components/PasswordReset/PasswordReset';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './components/Dashboard';
 import api from './services/api';
+import AuthLayout from './components/AuthLayout';
 
 function AuthCallback() {
   const [searchParams] = useSearchParams();
@@ -23,7 +23,11 @@ function AuthCallback() {
     }
   }, [token, error]);
 
-  return <div>Processing authentication...</div>;
+  return (
+    <AuthLayout title="Processing authentication">
+      <p className="stat-sub">Please wait while we finalize your session…</p>
+    </AuthLayout>
+  );
 }
 
 function VerifyEmail() {
@@ -51,27 +55,25 @@ function VerifyEmail() {
   }, [token]);
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', textAlign: 'center' }}>
-      {status === 'loading' && <p>Verifying email...</p>}
+    <AuthLayout title="Email verification">
+      {status === 'loading' && <p className="stat-sub">Verifying email…</p>}
       {status === 'success' && (
         <>
-          <h2>Email Verified!</h2>
-          <p>{message}</p>
-          <a href="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
-            Go to Login
+          <p className="stat-sub">{message}</p>
+          <a href="/login" className="link">
+            Go to login
           </a>
         </>
       )}
       {status === 'error' && (
         <>
-          <h2>Verification Failed</h2>
-          <p>{message}</p>
-          <a href="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
-            Go to Login
+          <p className="error-text">{message}</p>
+          <a href="/login" className="link">
+            Go to login
           </a>
         </>
       )}
-    </div>
+    </AuthLayout>
   );
 }
 

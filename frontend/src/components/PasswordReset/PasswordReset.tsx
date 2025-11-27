@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
+import AuthLayout from '../AuthLayout';
 
 export default function PasswordReset() {
   const [searchParams] = useSearchParams();
@@ -50,115 +51,91 @@ export default function PasswordReset() {
 
   if (success && !token) {
     return (
-      <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', textAlign: 'center' }}>
-        <h2>Email Sent!</h2>
-        <p>Please check your email for password reset instructions.</p>
-      </div>
+      <AuthLayout title="Check your inbox">
+        <p className="stat-sub">We sent password reset instructions to {email || 'your email'}.</p>
+      </AuthLayout>
     );
   }
 
   if (success && token) {
     return (
-      <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', textAlign: 'center' }}>
-        <h2>Password Reset Successful!</h2>
-        <p>Your password has been reset. You can now login with your new password.</p>
-        <a href="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
-          Go to Login
+      <AuthLayout title="Password updated">
+        <p className="stat-sub">Your password is now updated. You can sign in with your new credentials.</p>
+        <a href="/login" className="link">
+          Go to login
         </a>
-      </div>
+      </AuthLayout>
     );
   }
 
   if (token) {
     return (
-      <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px' }}>
-        <h1>Reset Password</h1>
-        <form onSubmit={handleResetPassword}>
-          <div style={{ marginBottom: '15px' }}>
-            <label>
-              New Password:
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
+      <AuthLayout title="Choose a new password">
+        <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <label className="stat-sub" htmlFor="password">
+              New password
             </label>
+            <input
+              id="password"
+              className="input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+            />
           </div>
-          <div style={{ marginBottom: '15px' }}>
-            <label>
-              Confirm Password:
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
+          <div>
+            <label className="stat-sub" htmlFor="confirmPassword">
+              Confirm new password
             </label>
+            <input
+              id="confirmPassword"
+              className="input"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
           </div>
-          {error && <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '10px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {loading ? 'Resetting...' : 'Reset Password'}
+          {error && <p className="error-text">{error}</p>}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Updating…' : 'Reset password'}
           </button>
         </form>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px' }}>
-      <h1>Forgot Password</h1>
-      <form onSubmit={handleRequestReset}>
-        <div style={{ marginBottom: '15px' }}>
-          <label>
-            Email:
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-            />
+    <AuthLayout title="Forgot password?" subtitle="We’ll email you a secure link to create a new one">
+      <form onSubmit={handleRequestReset} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div>
+          <label className="stat-sub" htmlFor="email">
+            Email address
           </label>
+          <input
+            id="email"
+            className="input"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="you@example.com"
+          />
         </div>
-        {error && <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-          }}
-        >
-          {loading ? 'Sending...' : 'Send Reset Link'}
+        {error && <p className="error-text">{error}</p>}
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? 'Sending link…' : 'Send reset link'}
         </button>
       </form>
-      <div style={{ marginTop: '15px', textAlign: 'center' }}>
-        <a href="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
-          Back to Login
+      <div style={{ marginTop: 16, textAlign: 'center' }}>
+        <a href="/login" className="link">
+          Back to login
         </a>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
 
