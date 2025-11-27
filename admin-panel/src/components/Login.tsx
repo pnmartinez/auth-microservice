@@ -28,7 +28,7 @@ export default function Login() {
   return (
     <div className="auth-wrapper">
       <div className="auth-card">
-        <p className="eyebrow">Zorouli Control</p>
+        <p className="eyebrow">Auth microservice Control</p>
         <h1>Welcome back</h1>
         <p className="stat-sub" style={{ marginBottom: '24px' }}>
           Use your admin credentials to access the control center.

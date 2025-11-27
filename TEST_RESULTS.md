@@ -1,4 +1,4 @@
-# Resultados de Testing - Aplicación Zorouli
+# Resultados de Testing - Aplicación Auth microservice
 
 ## Resumen de Tests Implementados
 
