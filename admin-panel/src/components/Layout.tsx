@@ -33,7 +33,7 @@ export default function Layout({ title, subtitle, actions, children }: LayoutPro
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="logo">Zorouli Admin</div>
+        <div className="logo">Auto Microservice Admin</div>
         <nav className="nav-links">
           {navLinks.map((link) => (
             <NavLink
